@@ -31,21 +31,31 @@ Preview any website inside an accurately sized mobile or tablet viewport. One cl
 
 Issues are open for each — contributions welcome (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
-## Install (from source)
+## Install
 
-Until the extension is published to the Chrome Web Store, install it locally:
+### For users — download & load (no Node, no build)
 
-1. Clone the repo and build:
-   ```bash
-   git clone https://github.com/TheDukeElephant/mobile-simulator-chrome-extension.git
-   cd mobile-simulator-chrome-extension
-   npm install
-   npm run build
-   ```
-2. Open `chrome://extensions` in Chrome.
-3. Toggle **Developer mode** (top right).
-4. Click **Load unpacked** and select the generated `dist/` folder.
-5. Pin the extension's icon to the toolbar.
+1. Go to the **[Releases page](https://github.com/TheDukeElephant/mobile-simulator-chrome-extension/releases)** and download the latest `mobile-simulator-vX.Y.Z.zip`.
+2. Unzip the file anywhere on your computer.
+3. Open `chrome://extensions` in Chrome.
+4. Toggle **Developer mode** on (top right).
+5. Click **Load unpacked** and select the unzipped folder.
+6. Pin the extension's icon to the toolbar — done.
+
+> No auto-updates with this install method. To update, download the newer release ZIP, click **Remove** on the old extension, and **Load unpacked** the new one (or just refresh in place by pointing at the new folder).
+
+### For developers — build from source
+
+```bash
+git clone https://github.com/TheDukeElephant/mobile-simulator-chrome-extension.git
+cd mobile-simulator-chrome-extension
+npm install
+npm run dev    # HMR build, writes live to dist/
+```
+
+Then `chrome://extensions` → Developer mode → **Load unpacked** → select `dist/` once. After that, edits hot-reload automatically.
+
+For a one-off production build: `npm run build` (do **not** run while `npm run dev` is active — it empties `dist/`).
 
 ## Usage
 

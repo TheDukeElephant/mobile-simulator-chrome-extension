@@ -1,227 +1,56 @@
 [
-  {
-    "id": "iphone-se-3",
-    "name": "iPhone SE (3rd gen)",
-    "category": "phone",
-    "width": 375,
-    "height": 667,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-13-mini",
-    "name": "iPhone 13 mini",
-    "category": "phone",
-    "width": 375,
-    "height": 812,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-14",
-    "name": "iPhone 14",
-    "category": "phone",
-    "width": 390,
-    "height": 844,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-14-plus",
-    "name": "iPhone 14 Plus",
-    "category": "phone",
-    "width": 428,
-    "height": 926,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-15",
-    "name": "iPhone 15",
-    "category": "phone",
-    "width": 393,
-    "height": 852,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-15-pro",
-    "name": "iPhone 15 Pro",
-    "category": "phone",
-    "width": 393,
-    "height": 852,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-15-pro-max",
-    "name": "iPhone 15 Pro Max",
-    "category": "phone",
-    "width": 430,
-    "height": 932,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-16",
-    "name": "iPhone 16",
-    "category": "phone",
-    "width": 393,
-    "height": 852,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "iphone-16-pro-max",
-    "name": "iPhone 16 Pro Max",
-    "category": "phone",
-    "width": 440,
-    "height": 956,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "pixel-7",
-    "name": "Google Pixel 7",
-    "category": "phone",
-    "width": 412,
-    "height": 915,
-    "devicePixelRatio": 2.625,
-    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "pixel-8",
-    "name": "Google Pixel 8",
-    "category": "phone",
-    "width": 412,
-    "height": 915,
-    "devicePixelRatio": 2.625,
-    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "pixel-8-pro",
-    "name": "Google Pixel 8 Pro",
-    "category": "phone",
-    "width": 448,
-    "height": 998,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "pixel-9",
-    "name": "Google Pixel 9",
-    "category": "phone",
-    "width": 412,
-    "height": 915,
-    "devicePixelRatio": 2.625,
-    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "galaxy-s23",
-    "name": "Samsung Galaxy S23",
-    "category": "phone",
-    "width": 360,
-    "height": 780,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "galaxy-s23-ultra",
-    "name": "Samsung Galaxy S23 Ultra",
-    "category": "phone",
-    "width": 412,
-    "height": 915,
-    "devicePixelRatio": 3.5,
-    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "galaxy-s24",
-    "name": "Samsung Galaxy S24",
-    "category": "phone",
-    "width": 360,
-    "height": 780,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "galaxy-s24-ultra",
-    "name": "Samsung Galaxy S24 Ultra",
-    "category": "phone",
-    "width": 412,
-    "height": 915,
-    "devicePixelRatio": 3.5,
-    "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "galaxy-z-fold-5",
-    "name": "Samsung Galaxy Z Fold5 (folded)",
-    "category": "phone",
-    "width": 344,
-    "height": 882,
-    "devicePixelRatio": 3,
-    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-F946B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "android-small",
-    "name": "Small Android (320×640)",
-    "category": "phone",
-    "width": 320,
-    "height": 640,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-A032F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36"
-  },
-  {
-    "id": "ipad-mini-6",
-    "name": "iPad mini (6th gen)",
-    "category": "tablet",
-    "width": 744,
-    "height": 1133,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "ipad-air-11",
-    "name": "iPad Air 11\"",
-    "category": "tablet",
-    "width": 820,
-    "height": 1180,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "ipad-pro-11",
-    "name": "iPad Pro 11\"",
-    "category": "tablet",
-    "width": 834,
-    "height": 1194,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "ipad-pro-13",
-    "name": "iPad Pro 13\"",
-    "category": "tablet",
-    "width": 1024,
-    "height": 1366,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-  },
-  {
-    "id": "galaxy-tab-s9",
-    "name": "Samsung Galaxy Tab S9",
-    "category": "tablet",
-    "width": 800,
-    "height": 1280,
-    "devicePixelRatio": 2,
-    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-  },
-  {
-    "id": "surface-duo",
-    "name": "Surface Duo",
-    "category": "tablet",
-    "width": 540,
-    "height": 720,
-    "devicePixelRatio": 2.5,
-    "userAgent": "Mozilla/5.0 (Linux; Android 11; Surface Duo) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-  }
+  { "id": "iphone-5", "name": "iPhone 5", "category": "phone", "width": 320, "height": 568, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1" },
+  { "id": "iphone-se", "name": "iPhone SE", "category": "phone", "width": 375, "height": 667, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1" },
+  { "id": "iphone-x", "name": "iPhone X", "category": "phone", "width": 375, "height": 812, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-xr", "name": "iPhone XR", "category": "phone", "width": 414, "height": 896, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-11", "name": "iPhone 11", "category": "phone", "width": 414, "height": 896, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-11-pro", "name": "iPhone 11 Pro", "category": "phone", "width": 375, "height": 812, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-11-pro-max", "name": "iPhone 11 Pro Max", "category": "phone", "width": 414, "height": 896, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-12-mini", "name": "iPhone 12 Mini", "category": "phone", "width": 360, "height": 780, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-12", "name": "iPhone 12", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-12-pro", "name": "iPhone 12 Pro", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-12-pro-max", "name": "iPhone 12 Pro Max", "category": "phone", "width": 428, "height": 926, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 209, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-13-mini", "name": "iPhone 13 Mini", "category": "phone", "width": 375, "height": 812, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-13", "name": "iPhone 13", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-13-pro", "name": "iPhone 13 Pro", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-13-pro-max", "name": "iPhone 13 Pro Max", "category": "phone", "width": 428, "height": 926, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-14", "name": "iPhone 14", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-14-plus", "name": "iPhone 14 Plus", "category": "phone", "width": 428, "height": 926, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "notch", "width": 165, "height": 30, "topOffset": 0 } },
+  { "id": "iphone-14-pro", "name": "iPhone 14 Pro", "category": "phone", "width": 393, "height": 852, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-14-pro-max", "name": "iPhone 14 Pro Max", "category": "phone", "width": 430, "height": 932, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-15", "name": "iPhone 15", "category": "phone", "width": 393, "height": 852, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-15-plus", "name": "iPhone 15 Plus", "category": "phone", "width": 430, "height": 932, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-15-pro", "name": "iPhone 15 Pro", "category": "phone", "width": 393, "height": 852, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-15-pro-max", "name": "iPhone 15 Pro Max", "category": "phone", "width": 430, "height": 932, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-16", "name": "iPhone 16", "category": "phone", "width": 393, "height": 852, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-16-plus", "name": "iPhone 16 Plus", "category": "phone", "width": 430, "height": 932, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-16-pro-max", "name": "iPhone 16 Pro Max", "category": "phone", "width": 440, "height": 956, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-17", "name": "iPhone 17", "category": "phone", "width": 402, "height": 874, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-air", "name": "iPhone Air", "category": "phone", "width": 412, "height": 894, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-17-pro", "name": "iPhone 17 Pro", "category": "phone", "width": 402, "height": 874, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+  { "id": "iphone-17-pro-max", "name": "iPhone 17 Pro Max", "category": "phone", "width": 440, "height": 956, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1", "notch": { "type": "dynamic-island", "width": 125, "height": 37, "topOffset": 11 } },
+
+  { "id": "galaxy-s20", "name": "Samsung Galaxy S20", "category": "phone", "width": 360, "height": 800, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 11; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36" },
+  { "id": "xiaomi-mi-11i", "name": "Xiaomi Mi 11i", "category": "phone", "width": 393, "height": 851, "devicePixelRatio": 2.75, "userAgent": "Mozilla/5.0 (Linux; Android 11; M2012K11G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36" },
+  { "id": "huawei-p30-pro", "name": "Huawei P30 Pro", "category": "phone", "width": 360, "height": 780, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 10; VOG-L29) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36" },
+  { "id": "pixel-5", "name": "Google Pixel 5", "category": "phone", "width": 393, "height": 851, "devicePixelRatio": 2.75, "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "oneplus-nord-2", "name": "OnePlus Nord 2", "category": "phone", "width": 412, "height": 915, "devicePixelRatio": 2.625, "userAgent": "Mozilla/5.0 (Linux; Android 12; DN2103) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-z-flip-3", "name": "Samsung Galaxy Z Flip3", "category": "phone", "width": 360, "height": 819, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 11; SM-F711B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36" },
+  { "id": "oppo-find-x3-pro", "name": "OPPO Find X3 Pro", "category": "phone", "width": 412, "height": 919, "devicePixelRatio": 3.5, "userAgent": "Mozilla/5.0 (Linux; Android 11; CPH2173) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-a12", "name": "Samsung Galaxy A12", "category": "phone", "width": 360, "height": 800, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (Linux; Android 11; SM-A125F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s21-ultra", "name": "Samsung Galaxy S21 Ultra", "category": "phone", "width": 384, "height": 854, "devicePixelRatio": 3.75, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "pixel-6-pro", "name": "Google Pixel 6 Pro", "category": "phone", "width": 412, "height": 892, "devicePixelRatio": 3.5, "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36" },
+  { "id": "xiaomi-12", "name": "Xiaomi 12", "category": "phone", "width": 390, "height": 844, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 12; 2201123G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-note-20-ultra", "name": "Samsung Galaxy Note 20 Ultra", "category": "phone", "width": 412, "height": 915, "devicePixelRatio": 3.5, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-N986B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s22", "name": "Samsung Galaxy S22", "category": "phone", "width": 360, "height": 780, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s22-plus", "name": "Samsung Galaxy S22+", "category": "phone", "width": 384, "height": 854, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-S906B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s22-ultra", "name": "Samsung Galaxy S22 Ultra", "category": "phone", "width": 384, "height": 854, "devicePixelRatio": 3.75, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36" },
+  { "id": "pixel-8", "name": "Google Pixel 8", "category": "phone", "width": 412, "height": 915, "devicePixelRatio": 2.625, "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s24", "name": "Samsung Galaxy S24", "category": "phone", "width": 360, "height": 780, "devicePixelRatio": 3, "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36" },
+  { "id": "galaxy-s24-ultra", "name": "Samsung Galaxy S24 Ultra", "category": "phone", "width": 412, "height": 915, "devicePixelRatio": 3.5, "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36" },
+
+  { "id": "ipad-mini", "name": "iPad Mini", "category": "tablet", "width": 768, "height": 1024, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1" },
+  { "id": "ipad-air-4", "name": "iPad Air 4", "category": "tablet", "width": 820, "height": 1180, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1" },
+  { "id": "ipad-pro-11", "name": "iPad Pro 11\"", "category": "tablet", "width": 834, "height": 1194, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" },
+  { "id": "galaxy-tab-s7", "name": "Samsung Galaxy Tab S7", "category": "tablet", "width": 800, "height": 1280, "devicePixelRatio": 2, "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-T870) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36" }
 ]

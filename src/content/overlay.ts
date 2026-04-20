@@ -15,6 +15,7 @@ interface OverlayHandle {
   shadow: ShadowRoot;
   iframe: HTMLIFrameElement;
   frameWrap: HTMLElement;
+  notchEl: HTMLElement;
   topLabel: HTMLElement;
   topDims: HTMLElement;
   pickerPanel: HTMLElement;
@@ -114,6 +115,7 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     }
 
     .frame-wrap {
+      position: relative;
       background: #ffffff;
       border-radius: 14px;
       overflow: hidden;
@@ -124,6 +126,26 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       display: block;
       border: 0;
       background: #ffffff;
+    }
+
+    /* Notch / Dynamic Island overlay sits above the iframe, top-center */
+    .notch {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000000;
+      z-index: 2;
+      pointer-events: none;
+      display: none;
+    }
+    .notch.visible { display: block; }
+    .notch.notch-classic {
+      top: 0;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+    .notch.notch-island {
+      border-radius: 999px;
     }
 
     /* Device picker panel slides in from the right, sits left of the sidebar */
@@ -213,7 +235,10 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     'fullscreen; geolocation; camera; microphone; clipboard-read; clipboard-write',
   );
   iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+  const notchEl = document.createElement('div');
+  notchEl.className = 'notch';
   frameWrap.appendChild(iframe);
+  frameWrap.appendChild(notchEl);
   stage.appendChild(frameWrap);
 
   // Picker panel (initially hidden)
@@ -285,6 +310,7 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     shadow,
     iframe,
     frameWrap,
+    notchEl,
     topLabel,
     topDims,
     pickerPanel,
@@ -342,7 +368,25 @@ function applyState(handle: OverlayHandle): void {
     handle.iframe.src = window.location.href;
   }
 
+  applyNotch(handle, device);
+
   renderPicker(handle, '');
+}
+
+function applyNotch(handle: OverlayHandle, device: Device): void {
+  const notch = device.notch;
+  // Only render the cutout in portrait — in landscape the notch is on the side
+  // and would obscure the iframe inaccurately.
+  if (!notch || handle.state.orientation !== 'portrait') {
+    handle.notchEl.classList.remove('visible', 'notch-classic', 'notch-island');
+    return;
+  }
+  handle.notchEl.classList.add('visible');
+  handle.notchEl.classList.toggle('notch-classic', notch.type === 'notch');
+  handle.notchEl.classList.toggle('notch-island', notch.type === 'dynamic-island');
+  handle.notchEl.style.width = `${notch.width}px`;
+  handle.notchEl.style.height = `${notch.height}px`;
+  handle.notchEl.style.top = `${notch.topOffset}px`;
 }
 
 function renderPicker(handle: OverlayHandle, filter: string): void {
