@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobile Simulator</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Mobile Simulator</h1>
+      <button id="stop-btn" class="stop-btn" hidden>Stop emulating</button>
+    </header>
+    <input id="search" class="search" type="search" placeholder="Search devices…" autocomplete="off" />
+    <div id="device-list" class="device-list" role="list"></div>
+    <footer class="footer">
+      <span id="status" class="status">Pick a device to start</span>
+    </footer>
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>

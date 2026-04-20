@@ -1,0 +1,11 @@
+/* Overlay styles injected into the host page. Scoped via a fixed root id and
+   high-specificity selectors; the actual UI lives inside Shadow DOM, but this
+   stylesheet covers the host root in case Shadow DOM isn't available. */
+
+#__mobile_simulator_root__ {
+  all: initial;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+}

@@ -1,0 +1,227 @@
+[
+  {
+    "id": "iphone-se-3",
+    "name": "iPhone SE (3rd gen)",
+    "category": "phone",
+    "width": 375,
+    "height": 667,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-13-mini",
+    "name": "iPhone 13 mini",
+    "category": "phone",
+    "width": 375,
+    "height": 812,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-14",
+    "name": "iPhone 14",
+    "category": "phone",
+    "width": 390,
+    "height": 844,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-14-plus",
+    "name": "iPhone 14 Plus",
+    "category": "phone",
+    "width": 428,
+    "height": 926,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-15",
+    "name": "iPhone 15",
+    "category": "phone",
+    "width": 393,
+    "height": 852,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-15-pro",
+    "name": "iPhone 15 Pro",
+    "category": "phone",
+    "width": 393,
+    "height": 852,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-15-pro-max",
+    "name": "iPhone 15 Pro Max",
+    "category": "phone",
+    "width": 430,
+    "height": 932,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-16",
+    "name": "iPhone 16",
+    "category": "phone",
+    "width": 393,
+    "height": 852,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "iphone-16-pro-max",
+    "name": "iPhone 16 Pro Max",
+    "category": "phone",
+    "width": 440,
+    "height": 956,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "pixel-7",
+    "name": "Google Pixel 7",
+    "category": "phone",
+    "width": 412,
+    "height": 915,
+    "devicePixelRatio": 2.625,
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "pixel-8",
+    "name": "Google Pixel 8",
+    "category": "phone",
+    "width": 412,
+    "height": 915,
+    "devicePixelRatio": 2.625,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "pixel-8-pro",
+    "name": "Google Pixel 8 Pro",
+    "category": "phone",
+    "width": 448,
+    "height": 998,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "pixel-9",
+    "name": "Google Pixel 9",
+    "category": "phone",
+    "width": 412,
+    "height": 915,
+    "devicePixelRatio": 2.625,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "galaxy-s23",
+    "name": "Samsung Galaxy S23",
+    "category": "phone",
+    "width": 360,
+    "height": 780,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "galaxy-s23-ultra",
+    "name": "Samsung Galaxy S23 Ultra",
+    "category": "phone",
+    "width": 412,
+    "height": 915,
+    "devicePixelRatio": 3.5,
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "galaxy-s24",
+    "name": "Samsung Galaxy S24",
+    "category": "phone",
+    "width": 360,
+    "height": 780,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "galaxy-s24-ultra",
+    "name": "Samsung Galaxy S24 Ultra",
+    "category": "phone",
+    "width": 412,
+    "height": 915,
+    "devicePixelRatio": 3.5,
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "galaxy-z-fold-5",
+    "name": "Samsung Galaxy Z Fold5 (folded)",
+    "category": "phone",
+    "width": 344,
+    "height": 882,
+    "devicePixelRatio": 3,
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-F946B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "android-small",
+    "name": "Small Android (320×640)",
+    "category": "phone",
+    "width": 320,
+    "height": 640,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (Linux; Android 12; SM-A032F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36"
+  },
+  {
+    "id": "ipad-mini-6",
+    "name": "iPad mini (6th gen)",
+    "category": "tablet",
+    "width": 744,
+    "height": 1133,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "ipad-air-11",
+    "name": "iPad Air 11\"",
+    "category": "tablet",
+    "width": 820,
+    "height": 1180,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "ipad-pro-11",
+    "name": "iPad Pro 11\"",
+    "category": "tablet",
+    "width": 834,
+    "height": 1194,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "ipad-pro-13",
+    "name": "iPad Pro 13\"",
+    "category": "tablet",
+    "width": 1024,
+    "height": 1366,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "id": "galaxy-tab-s9",
+    "name": "Samsung Galaxy Tab S9",
+    "category": "tablet",
+    "width": 800,
+    "height": 1280,
+    "devicePixelRatio": 2,
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  },
+  {
+    "id": "surface-duo",
+    "name": "Surface Duo",
+    "category": "tablet",
+    "width": 540,
+    "height": 720,
+    "devicePixelRatio": 2.5,
+    "userAgent": "Mozilla/5.0 (Linux; Android 11; Surface Duo) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  }
+]
