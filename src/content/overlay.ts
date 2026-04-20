@@ -1,4 +1,4 @@
-import { getDeviceById, getDevices, type Device } from '../devices';
+import { getChromeLayout, getDeviceById, getDevices, type Device } from '../devices';
 import type {
   EmulateStartMessage,
   EmulateStoppedNotice,
@@ -16,6 +16,11 @@ interface OverlayHandle {
   iframe: HTMLIFrameElement;
   frameWrap: HTMLElement;
   notchEl: HTMLElement;
+  statusBar: HTMLElement;
+  statusTime: HTMLElement;
+  urlBar: HTMLElement;
+  urlText: HTMLElement;
+  homeIndicator: HTMLElement;
   topLabel: HTMLElement;
   topDims: HTMLElement;
   pickerPanel: HTMLElement;
@@ -114,27 +119,116 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       padding: 24px;
     }
 
+    /* Device frame: the entire phone screen rectangle, rounded to match the
+       real device's display corner radius. */
     .frame-wrap {
       position: relative;
       background: #ffffff;
-      border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0,0,0,0.55);
       transform-origin: center center;
+      display: flex;
+      flex-direction: column;
     }
+
+    /* Browser chrome bars */
+    .status-bar {
+      flex: 0 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #000000;
+      background: #ffffff;
+      position: relative;
+      z-index: 1;
+    }
+    .status-bar.ios-island { padding-top: 4px; }
+    .status-bar .status-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    .status-bar .icon { width: 16px; height: 12px; }
+
+    .url-bar {
+      flex: 0 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #f1f3f4;
+      border-color: #d8dadd;
+    }
+    .url-bar.ios { background: #f6f6f6; }
+    .url-bar.ios.bottom { border-top: 1px solid #d8dadd; }
+    .url-bar.android.top { border-bottom: 1px solid #d8dadd; }
+    .url-bar .pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #ffffff;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #1f2329;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      border: 1px solid #e6e8ea;
+    }
+    .url-bar.ios .pill { background: #e3e3e8; border: none; color: #000; justify-content: center; }
+    .url-bar svg { width: 18px; height: 18px; color: #5f6368; flex-shrink: 0; }
+    .url-bar.android svg { color: #5f6368; }
+    .url-bar.ios svg { color: #1f2329; }
+    .url-bar .lock { width: 12px; height: 12px; }
+
+    .home-indicator {
+      flex: 0 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+    .home-indicator.dark { background: #ffffff; }
+    .home-indicator .pill {
+      width: 134px;
+      height: 5px;
+      background: #1f2329;
+      border-radius: 3px;
+      margin: 8px 0 8px;
+    }
+    .home-indicator.android .pill {
+      width: 108px;
+      height: 4px;
+      background: #5f6368;
+      border-radius: 2px;
+      margin: 10px 0 10px;
+    }
+
     iframe {
+      flex: 1 1 auto;
       display: block;
       border: 0;
       background: #ffffff;
+      width: 100%;
+      min-height: 0;
     }
 
-    /* Notch / Dynamic Island overlay sits above the iframe, top-center */
+    /* Notch / Dynamic Island overlay sits above the status bar */
     .notch {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       background: #000000;
-      z-index: 2;
+      z-index: 3;
       pointer-events: none;
       display: none;
     }
@@ -144,11 +238,9 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       border-bottom-left-radius: 18px;
       border-bottom-right-radius: 18px;
     }
-    .notch.notch-island {
-      border-radius: 999px;
-    }
+    .notch.notch-island { border-radius: 999px; }
 
-    /* Device picker panel slides in from the right, sits left of the sidebar */
+    /* Picker panel */
     .picker-panel {
       position: absolute;
       top: 56px;
@@ -162,14 +254,10 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       display: none;
       flex-direction: column;
       overflow: hidden;
+      z-index: 10;
     }
     .picker-panel.open { display: flex; }
-    .picker-header {
-      padding: 10px 12px;
-      border-bottom: 1px solid #3a3f45;
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .picker-header { padding: 10px 12px; border-bottom: 1px solid #3a3f45; font-size: 13px; font-weight: 600; }
     .picker-search {
       margin: 8px 12px;
       padding: 6px 8px;
@@ -206,7 +294,6 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     .device-row:hover { background: #2a2f35; }
     .device-row.active { background: #1c3a5e; }
     .device-row .dims-cell { color: #9ba2aa; font-size: 11px; font-variant-numeric: tabular-nums; }
-
     .empty { padding: 24px 12px; text-align: center; color: #9ba2aa; font-size: 13px; }
   `;
   shadow.appendChild(style);
@@ -214,7 +301,6 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   const backdrop = document.createElement('div');
   backdrop.className = 'backdrop';
 
-  // Top bar
   const topbar = document.createElement('div');
   topbar.className = 'topbar';
   const topLabel = document.createElement('span');
@@ -224,24 +310,70 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   topbar.appendChild(topLabel);
   topbar.appendChild(topDims);
 
-  // Stage
   const stage = document.createElement('div');
   stage.className = 'stage';
+
+  // Device frame
   const frameWrap = document.createElement('div');
   frameWrap.className = 'frame-wrap';
+
+  // Status bar
+  const statusBar = document.createElement('div');
+  statusBar.className = 'status-bar';
+  const statusTime = document.createElement('span');
+  statusTime.className = 'status-time';
+  const statusRight = document.createElement('span');
+  statusRight.className = 'status-right';
+  statusRight.innerHTML = `
+    <svg class="icon" viewBox="0 0 18 12" fill="currentColor"><path d="M1 9h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-2h2v8h-2z"/></svg>
+    <svg class="icon" viewBox="0 0 18 12" fill="currentColor"><path d="M9 2C5.5 2 2.7 4.3 1 6.5l1.4 1.1C3.9 5.6 6.3 4 9 4s5.1 1.6 6.6 3.6L17 6.5C15.3 4.3 12.5 2 9 2zm0 4c-1.7 0-3.2.9-4 2l1.4 1c.6-.7 1.6-1 2.6-1s2 .3 2.6 1L13 8c-.8-1.1-2.3-2-4-2z"/></svg>
+    <svg class="icon" viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="2" width="20" height="8" rx="2"/><rect x="2.5" y="3.5" width="15" height="5" fill="currentColor" stroke="none"/><rect x="22" y="4.5" width="1.5" height="3" fill="currentColor" stroke="none"/></svg>
+  `;
+  statusBar.appendChild(statusTime);
+  statusBar.appendChild(statusRight);
+
+  // URL bar
+  const urlBar = document.createElement('div');
+  urlBar.className = 'url-bar';
+  const urlPill = document.createElement('div');
+  urlPill.className = 'pill';
+  urlPill.innerHTML = `
+    <svg class="lock" viewBox="0 0 12 12" fill="currentColor"><path d="M3 5V4a3 3 0 0 1 6 0v1h1v6H2V5h1zm1 0h4V4a2 2 0 0 0-4 0v1z"/></svg>
+    <span class="url-text"></span>
+  `;
+  const urlText = urlPill.querySelector('.url-text') as HTMLSpanElement;
+  urlBar.appendChild(urlPill);
+
+  // Iframe
   const iframe = document.createElement('iframe');
   iframe.setAttribute(
     'allow',
     'fullscreen; geolocation; camera; microphone; clipboard-read; clipboard-write',
   );
   iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+
+  // Home indicator
+  const homeIndicator = document.createElement('div');
+  homeIndicator.className = 'home-indicator';
+  const homePill = document.createElement('div');
+  homePill.className = 'pill';
+  homeIndicator.appendChild(homePill);
+
+  // Notch overlay
   const notchEl = document.createElement('div');
   notchEl.className = 'notch';
+
+  // Default order: status -> urlBar -> iframe -> homeIndicator (Android-like)
+  // applyState will reorder for iOS bottom URL.
+  frameWrap.appendChild(statusBar);
+  frameWrap.appendChild(urlBar);
   frameWrap.appendChild(iframe);
+  frameWrap.appendChild(homeIndicator);
   frameWrap.appendChild(notchEl);
+
   stage.appendChild(frameWrap);
 
-  // Picker panel (initially hidden)
+  // Picker panel
   const pickerPanel = document.createElement('div');
   pickerPanel.className = 'picker-panel';
   const pickerHeader = document.createElement('div');
@@ -297,7 +429,6 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   backdrop.appendChild(sidebar);
   shadow.appendChild(backdrop);
 
-  // Click outside picker closes it
   stage.addEventListener('click', (e) => {
     if (!pickerPanel.classList.contains('open')) return;
     if (e.target instanceof Node && pickerPanel.contains(e.target)) return;
@@ -311,6 +442,11 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     iframe,
     frameWrap,
     notchEl,
+    statusBar,
+    statusTime,
+    urlBar,
+    urlText,
+    homeIndicator,
     topLabel,
     topDims,
     pickerPanel,
@@ -340,6 +476,20 @@ function effectiveDimensions(device: Device, orientation: Orientation): { w: num
   return { w: device.width, h: device.height };
 }
 
+function formatTime(): string {
+  const d = new Date();
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function safeHostPath(): string {
+  try {
+    const u = new URL(window.location.href);
+    return u.host + (u.pathname === '/' ? '' : u.pathname);
+  } catch {
+    return window.location.href;
+  }
+}
+
 function applyState(handle: OverlayHandle): void {
   const device = getDeviceById(handle.state.deviceId);
   if (!device) return;
@@ -355,10 +505,51 @@ function applyState(handle: OverlayHandle): void {
   handle.frameWrap.style.width = `${w}px`;
   handle.frameWrap.style.height = `${h}px`;
   handle.frameWrap.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  handle.frameWrap.style.borderRadius = `${device.cornerRadius}px`;
 
-  handle.iframe.style.width = `${w}px`;
-  handle.iframe.style.height = `${h}px`;
+  // Browser chrome
+  const chrome = getChromeLayout(device);
 
+  // Status bar
+  handle.statusBar.style.height = `${chrome.statusBarHeight}px`;
+  handle.statusTime.textContent = formatTime();
+  handle.statusBar.classList.toggle(
+    'ios-island',
+    device.platform === 'ios' && device.notch?.type === 'dynamic-island',
+  );
+
+  // URL bar styling per platform
+  handle.urlBar.classList.toggle('ios', device.platform === 'ios');
+  handle.urlBar.classList.toggle('android', device.platform === 'android');
+  handle.urlBar.classList.toggle('top', chrome.urlBarPosition === 'top');
+  handle.urlBar.classList.toggle('bottom', chrome.urlBarPosition === 'bottom');
+  handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
+  handle.urlText.textContent = safeHostPath();
+
+  // Home indicator
+  handle.homeIndicator.style.display = chrome.homeIndicatorHeight > 0 ? 'flex' : 'none';
+  handle.homeIndicator.style.height = `${chrome.homeIndicatorHeight}px`;
+  handle.homeIndicator.classList.toggle('android', device.platform === 'android');
+
+  // Re-arrange chrome for bottom URL bar (iOS notched + classic)
+  // Order: statusBar -> iframe -> urlBar -> homeIndicator
+  // For Android (top URL): statusBar -> urlBar -> iframe -> homeIndicator
+  const wrap = handle.frameWrap;
+  wrap.appendChild(handle.statusBar);
+  if (chrome.urlBarPosition === 'top') {
+    wrap.appendChild(handle.urlBar);
+    wrap.appendChild(handle.iframe);
+  } else {
+    wrap.appendChild(handle.iframe);
+    wrap.appendChild(handle.urlBar);
+  }
+  wrap.appendChild(handle.homeIndicator);
+  wrap.appendChild(handle.notchEl); // notch always last so it overlays
+
+  // Iframe takes remaining space (set by flex: 1 1 auto)
+  handle.iframe.style.height = '';
+
+  // Top label
   handle.topLabel.textContent = `${device.name}${
     handle.state.orientation === 'landscape' ? ' · landscape' : ''
   }`;
@@ -369,14 +560,11 @@ function applyState(handle: OverlayHandle): void {
   }
 
   applyNotch(handle, device);
-
   renderPicker(handle, '');
 }
 
 function applyNotch(handle: OverlayHandle, device: Device): void {
   const notch = device.notch;
-  // Only render the cutout in portrait — in landscape the notch is on the side
-  // and would obscure the iframe inaccurately.
   if (!notch || handle.state.orientation !== 'portrait') {
     handle.notchEl.classList.remove('visible', 'notch-classic', 'notch-island');
     return;
