@@ -6,8 +6,7 @@ export default defineManifest({
   description: 'Preview any website in an accurately sized mobile or tablet viewport.',
   version: '0.1.0',
   action: {
-    default_title: 'Mobile Simulator',
-    default_popup: 'src/popup/index.html',
+    default_title: 'Mobile Simulator (click to toggle)',
   },
   background: {
     service_worker: 'src/background/service-worker.ts',

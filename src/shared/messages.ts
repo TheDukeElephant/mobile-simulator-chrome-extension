@@ -5,10 +5,22 @@ export type Orientation = 'portrait' | 'landscape';
 export interface EmulateStartMessage {
   type: 'EMULATE_START';
   deviceId: string;
+  orientation: Orientation;
 }
 
 export interface EmulateStopMessage {
   type: 'EMULATE_STOP';
+}
+
+// Sent from content script when the user picks a different device in the in-overlay picker.
+export interface SelectDeviceMessage {
+  type: 'SELECT_DEVICE';
+  deviceId: string;
+}
+
+// Sent from content script when the user toggles rotation in the overlay.
+export interface RotateMessage {
+  type: 'ROTATE';
 }
 
 export interface EmulateStatusRequest {
@@ -31,4 +43,6 @@ export type ExtensionMessage =
   | EmulateStopMessage
   | EmulateStatusRequest
   | EmulateStatusResponse
-  | EmulateStoppedNotice;
+  | EmulateStoppedNotice
+  | SelectDeviceMessage
+  | RotateMessage;

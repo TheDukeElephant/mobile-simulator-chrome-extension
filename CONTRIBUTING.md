@@ -24,20 +24,16 @@ npm run build
 ```
 src/
   background/
-    service-worker.ts   # message router, scripting injection, badge
+    service-worker.ts   # message router, action toggle, scripting injection, badge
     dnr-rules.ts        # per-tab DNR session rules (strip X-Frame-Options, CSP)
   content/
-    overlay.ts          # injected overlay + iframe
+    overlay.ts          # injected overlay (top bar, right sidebar, iframe, picker)
     overlay.css         # host-page styles for the overlay root
   devices/
     devices.json        # curated device catalog
     index.ts            # typed loader
-  popup/
-    index.html
-    popup.ts            # device picker UI
-    popup.css
   shared/
-    messages.ts         # typed message contracts (popup ↔ sw ↔ content)
+    messages.ts         # typed message contracts (action ↔ sw ↔ content)
   manifest.ts           # MV3 manifest definition (consumed by @crxjs/vite-plugin)
 public/icons/           # extension icons
 scripts/

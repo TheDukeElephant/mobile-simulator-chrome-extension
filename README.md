@@ -6,11 +6,13 @@ Preview any website inside an accurately sized mobile or tablet viewport. One cl
 
 ## Features (v0.1)
 
+- **One-click toggle**: clicking the toolbar icon instantly emulates the current page using your last-used device (defaults to iPhone 15 the first time). Click again to exit.
+- **In-overlay controls**: a top bar shows the active device + dimensions; a right-side sidebar holds **Close**, **Change device** (opens an inline picker with search), and **Rotate** (portrait ↔ landscape).
 - 25+ curated device presets (iPhone SE → 16 Pro Max, Pixel 7–9, Galaxy S23/S24, iPad mini/Air/Pro, Galaxy Tab, and more).
-- Pixel-accurate viewport sizing (width × height; DPR is recorded but not yet faked inside the iframe — see Limitations).
+- Pixel-accurate viewport sizing (DPR is recorded but not yet faked inside the iframe — see Limitations).
 - Per-tab activation; switch tabs without losing the page you're working on.
 - Bypasses common framing blockers (`X-Frame-Options`, CSP `frame-ancestors`) only on the active tab while emulation is on.
-- Last-used device is remembered.
+- Last-used device + orientation are remembered across tabs and sessions.
 - Keyboard shortcut: `Esc` closes the overlay.
 
 ## Roadmap
@@ -18,8 +20,9 @@ Preview any website inside an accurately sized mobile or tablet viewport. One cl
 | Feature | Status |
 | --- | --- |
 | Viewport sizing | ✅ v0.1 |
+| One-click toggle + in-overlay controls | ✅ v0.1 |
+| Rotate portrait / landscape | ✅ v0.1 |
 | Last-device memory + per-tab activation | ✅ v0.1 |
-| Rotate portrait / landscape | 🛠 v0.2 |
 | User-Agent spoofing | 🛠 v0.2 |
 | Touch event simulation | 🛠 v0.2 |
 | Device frames (bezel / notch) | 🛠 v0.3 |
@@ -47,15 +50,18 @@ Until the extension is published to the Chrome Web Store, install it locally:
 ## Usage
 
 1. Open any website.
-2. Click the **Mobile Simulator** toolbar icon.
-3. Pick a device from the popup. The current page reloads inside the chosen viewport.
-4. Click **✕ Close** in the overlay (or press `Esc`) to return to the original page. Pick a different device any time to switch.
+2. Click the **Mobile Simulator** toolbar icon — the page is instantly reloaded inside your last-used device's viewport.
+3. Use the right-side sidebar:
+   - **✕** — close emulation (or press `Esc`).
+   - **Devices** — open the picker to switch devices.
+   - **↻** — toggle portrait ↔ landscape.
+4. Click the toolbar icon again to exit.
 
 ## How it works
 
-- A **content script** injects a Shadow-DOM-isolated overlay containing an `<iframe>` set to `window.location.href` with the chosen device's dimensions.
+- A **content script** injects a Shadow-DOM-isolated overlay containing an `<iframe>` set to `window.location.href` with the chosen device's dimensions. The overlay also hosts the top info bar, right-side sidebar, and inline device picker.
 - A **service worker** registers per-tab `declarativeNetRequest` session rules that strip `X-Frame-Options` and `Content-Security-Policy` (frame-ancestors) headers — only on the tab being emulated, only while emulation is active. Rules are cleaned up automatically on stop or tab close.
-- The **popup** sends start / stop / status messages to the service worker via typed message contracts (`src/shared/messages.ts`).
+- The **toolbar action** has no popup; clicking it directly toggles emulation. Device + orientation choices made inside the overlay are sent to the service worker via typed message contracts (`src/shared/messages.ts`).
 
 ## Limitations
 
