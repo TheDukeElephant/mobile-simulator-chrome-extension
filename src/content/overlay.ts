@@ -1,4 +1,10 @@
-import { getChromeLayout, getDeviceById, getDevices, type Device } from '../devices';
+import {
+  getChassis,
+  getChromeLayout,
+  getDeviceById,
+  getDevices,
+  type Device,
+} from '../devices';
 import type {
   EmulateStartMessage,
   EmulateStoppedNotice,
@@ -14,12 +20,14 @@ interface OverlayHandle {
   root: HTMLElement;
   shadow: ShadowRoot;
   iframe: HTMLIFrameElement;
-  frameWrap: HTMLElement;
+  chassis: HTMLElement;
+  screen: HTMLElement;
   notchEl: HTMLElement;
   statusBar: HTMLElement;
   statusTime: HTMLElement;
   urlBar: HTMLElement;
   urlText: HTMLElement;
+  loadingBar: HTMLElement;
   homeIndicator: HTMLElement;
   topLabel: HTMLElement;
   topDims: HTMLElement;
@@ -46,7 +54,10 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     .backdrop {
       position: fixed;
       inset: 0;
-      background: #2a2d31;
+      background:
+        radial-gradient(ellipse at 30% 20%, #34373c 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, #2c2f33 0%, transparent 60%),
+        #1f2226;
       color: #e6edf3;
       display: grid;
       grid-template-columns: 1fr 64px;
@@ -62,8 +73,8 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       align-items: center;
       justify-content: center;
       gap: 12px;
-      background: #1f2226;
-      border-bottom: 1px solid #3a3f45;
+      background: #1a1d20;
+      border-bottom: 1px solid #2f3338;
       padding: 0 16px;
       font-size: 14px;
       font-weight: 500;
@@ -80,8 +91,8 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
 
     .sidebar {
       grid-area: sidebar;
-      background: #1f2226;
-      border-left: 1px solid #3a3f45;
+      background: #1a1d20;
+      border-left: 1px solid #2f3338;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -116,45 +127,69 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      padding: 24px;
+      padding: 28px;
     }
 
-    /* Device frame: the entire phone screen rectangle, rounded to match the
-       real device's display corner radius. */
-    .frame-wrap {
+    /* === Device chassis (the physical phone body, around the screen) === */
+    .chassis {
+      position: relative;
+      background: var(--chassis, #1d1d1f);
+      transform-origin: center center;
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    }
+
+    /* Side hardware buttons (volume, power, silence switch) */
+    .btn {
+      position: absolute;
+      background: var(--button, #2c2c2e);
+      border-radius: 1.5px;
+      box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
+    }
+    .btn.left  { left: -1.5px; width: 3px; }
+    .btn.right { right: -1.5px; width: 3px; }
+
+    /* === Inner screen (content area) === */
+    .screen {
       position: relative;
       background: #ffffff;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
-      transform-origin: center center;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
     }
 
-    /* Browser chrome bars */
+    /* Status bar */
     .status-bar {
       flex: 0 0 auto;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 18px;
-      font-size: 14px;
+      padding: 0 22px;
+      font-size: 15px;
       font-weight: 600;
       color: #000000;
       background: #ffffff;
       position: relative;
-      z-index: 1;
+      z-index: 2;
+      letter-spacing: -0.01em;
     }
-    .status-bar.ios-island { padding-top: 4px; }
+    .status-bar.ios-island { padding-top: 6px; align-items: flex-start; padding-left: 28px; padding-right: 28px; }
+    .status-bar.ios-island .status-time { padding-top: 14px; }
+    .status-bar.ios-island .status-right { padding-top: 14px; }
     .status-bar .status-right {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-weight: 500;
     }
     .status-bar .icon { width: 16px; height: 12px; }
 
+    /* === URL bar variants === */
     .url-bar {
       flex: 0 0 auto;
       width: 100%;
@@ -163,11 +198,11 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       gap: 8px;
       padding: 6px 12px;
       background: #f1f3f4;
-      border-color: #d8dadd;
+      position: relative;
+      z-index: 2;
     }
-    .url-bar.ios { background: #f6f6f6; }
-    .url-bar.ios.bottom { border-top: 1px solid #d8dadd; }
-    .url-bar.android.top { border-bottom: 1px solid #d8dadd; }
+    .url-bar.android.top { border-bottom: 1px solid #d8dadd; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+    .url-bar.ios.classic { background: #f6f6f6; border-top: 1px solid #d8dadd; }
     .url-bar .pill {
       flex: 1;
       display: flex;
@@ -183,21 +218,76 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       text-overflow: ellipsis;
       border: 1px solid #e6e8ea;
     }
-    .url-bar.ios .pill { background: #e3e3e8; border: none; color: #000; justify-content: center; }
+    .url-bar.ios.classic .pill {
+      background: #e3e3e8;
+      border: none;
+      color: #000;
+      justify-content: center;
+    }
     .url-bar svg { width: 18px; height: 18px; color: #5f6368; flex-shrink: 0; }
     .url-bar.android svg { color: #5f6368; }
-    .url-bar.ios svg { color: #1f2329; }
+    .url-bar.ios.classic svg { color: #1f2329; }
     .url-bar .lock { width: 12px; height: 12px; }
 
+    /* iOS notched: floating "liquid glass" pill overlaid on top of content */
+    .url-bar.ios.floating {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 14px;
+      width: calc(100% - 16px);
+      max-width: 410px;
+      height: 50px;
+      padding: 0 8px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 999px;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.18),
+        0 1px 0 rgba(255, 255, 255, 0.7) inset;
+      z-index: 4;
+    }
+    .url-bar.ios.floating .pill {
+      flex: 1;
+      background: transparent;
+      border: none;
+      justify-content: center;
+      color: #1f2329;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 0 14px;
+    }
+    .url-bar.ios.floating svg { color: #1f2329; }
+
+    /* Loading progress bar inside the URL bar */
+    .loading-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: #2f81f7;
+      border-radius: 1px;
+      opacity: 0;
+      transition: width 0.4s ease, opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .url-bar.ios.floating .loading-bar { bottom: 4px; left: 14px; right: 14px; width: auto; }
+    .url-bar.loading .loading-bar { width: 70%; opacity: 1; }
+    .url-bar.loading-done .loading-bar { width: 100%; opacity: 0; }
+
+    /* Home indicator */
     .home-indicator {
       flex: 0 0 auto;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #ffffff;
+      background: transparent;
+      pointer-events: none;
     }
-    .home-indicator.dark { background: #ffffff; }
     .home-indicator .pill {
       width: 134px;
       height: 5px;
@@ -212,6 +302,13 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       border-radius: 2px;
       margin: 10px 0 10px;
     }
+    .home-indicator.floating {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 0;
+      z-index: 4;
+    }
+    .home-indicator.floating .pill { background: #1f2329; opacity: 0.85; }
 
     iframe {
       flex: 1 1 auto;
@@ -222,13 +319,13 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       min-height: 0;
     }
 
-    /* Notch / Dynamic Island overlay sits above the status bar */
+    /* Notch / Dynamic Island overlay */
     .notch {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       background: #000000;
-      z-index: 3;
+      z-index: 5;
       pointer-events: none;
       display: none;
     }
@@ -313,9 +410,24 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   const stage = document.createElement('div');
   stage.className = 'stage';
 
-  // Device frame
-  const frameWrap = document.createElement('div');
-  frameWrap.className = 'frame-wrap';
+  // Chassis (outer phone body)
+  const chassis = document.createElement('div');
+  chassis.className = 'chassis';
+
+  // Side buttons (filled in by applyState; up to 4 elements)
+  const btnSilent = makeButton('left');
+  const btnVolUp = makeButton('left');
+  const btnVolDn = makeButton('left');
+  const btnPower = makeButton('right');
+  chassis.appendChild(btnSilent);
+  chassis.appendChild(btnVolUp);
+  chassis.appendChild(btnVolDn);
+  chassis.appendChild(btnPower);
+
+  // Inner screen
+  const screen = document.createElement('div');
+  screen.className = 'screen';
+  chassis.appendChild(screen);
 
   // Status bar
   const statusBar = document.createElement('div');
@@ -343,6 +455,9 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   `;
   const urlText = urlPill.querySelector('.url-text') as HTMLSpanElement;
   urlBar.appendChild(urlPill);
+  const loadingBar = document.createElement('div');
+  loadingBar.className = 'loading-bar';
+  urlBar.appendChild(loadingBar);
 
   // Iframe
   const iframe = document.createElement('iframe');
@@ -363,15 +478,13 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   const notchEl = document.createElement('div');
   notchEl.className = 'notch';
 
-  // Default order: status -> urlBar -> iframe -> homeIndicator (Android-like)
-  // applyState will reorder for iOS bottom URL.
-  frameWrap.appendChild(statusBar);
-  frameWrap.appendChild(urlBar);
-  frameWrap.appendChild(iframe);
-  frameWrap.appendChild(homeIndicator);
-  frameWrap.appendChild(notchEl);
+  screen.appendChild(statusBar);
+  screen.appendChild(urlBar);
+  screen.appendChild(iframe);
+  screen.appendChild(homeIndicator);
+  screen.appendChild(notchEl);
 
-  stage.appendChild(frameWrap);
+  stage.appendChild(chassis);
 
   // Picker panel
   const pickerPanel = document.createElement('div');
@@ -436,16 +549,25 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     changeBtn.classList.remove('active');
   });
 
+  // Loading bar wired to iframe load lifecycle
+  iframe.addEventListener('load', () => {
+    urlBar.classList.remove('loading');
+    urlBar.classList.add('loading-done');
+    setTimeout(() => urlBar.classList.remove('loading-done'), 350);
+  });
+
   return {
     root,
     shadow,
     iframe,
-    frameWrap,
+    chassis,
+    screen,
     notchEl,
     statusBar,
     statusTime,
     urlBar,
     urlText,
+    loadingBar,
     homeIndicator,
     topLabel,
     topDims,
@@ -471,6 +593,12 @@ function makeIconButton(svg: string, title: string): HTMLButtonElement {
   return btn;
 }
 
+function makeButton(side: 'left' | 'right'): HTMLDivElement {
+  const el = document.createElement('div');
+  el.className = `btn ${side}`;
+  return el;
+}
+
 function effectiveDimensions(device: Device, orientation: Orientation): { w: number; h: number } {
   if (orientation === 'landscape') return { w: device.height, h: device.width };
   return { w: device.width, h: device.height };
@@ -490,25 +618,99 @@ function safeHostPath(): string {
   }
 }
 
+/**
+ * Side-button positions per platform / category. All values in CSS pixels of
+ * the screen height (portrait); the helper auto-mirrors for landscape via the
+ * chassis rotation. Buttons that don't apply for a device are positioned
+ * off-screen by setting height to 0.
+ */
+function getButtonLayout(device: Device): {
+  silent?: { top: number; height: number };
+  volUp?: { top: number; height: number };
+  volDn?: { top: number; height: number };
+  power?: { top: number; height: number };
+} {
+  if (device.category === 'tablet') {
+    return {
+      power: { top: 60, height: 50 },
+      volUp: { top: 60, height: 80 },
+    };
+  }
+  if (device.platform === 'ios') {
+    if (device.notch) {
+      // Modern iPhones: silent switch + 2 long volume buttons on left,
+      // long power button on right.
+      return {
+        silent: { top: 90, height: 30 },
+        volUp: { top: 140, height: 65 },
+        volDn: { top: 215, height: 65 },
+        power: { top: 165, height: 100 },
+      };
+    }
+    // Classic iPhone: silent switch + 2 small round volume buttons,
+    // small power button on right.
+    return {
+      silent: { top: 60, height: 22 },
+      volUp: { top: 100, height: 42 },
+      volDn: { top: 152, height: 42 },
+      power: { top: 60, height: 42 },
+    };
+  }
+  // Android phones: typical layout — power + volume on right side.
+  return {
+    power: { top: 200, height: 60 },
+    volUp: { top: 130, height: 100 },
+  };
+}
+
 function applyState(handle: OverlayHandle): void {
   const device = getDeviceById(handle.state.deviceId);
   if (!device) return;
-  const { w, h } = effectiveDimensions(device, handle.state.orientation);
+  const { w: screenW, h: screenH } = effectiveDimensions(device, handle.state.orientation);
 
-  const stage = handle.frameWrap.parentElement!;
+  const chrome = getChromeLayout(device);
+  const chassis = getChassis(device);
+
+  // Total chassis box = screen + bezel on each side
+  const chassisW = screenW + chassis.width * 2;
+  const chassisH = screenH + chassis.width * 2;
+
+  const stage = handle.chassis.parentElement!;
   const stageRect = stage.getBoundingClientRect();
   const padding = 32;
   const availableW = stageRect.width - padding;
   const availableH = stageRect.height - padding;
-  const scale = Math.min(1, availableW / w, availableH / h);
+  const scale = Math.min(1, availableW / chassisW, availableH / chassisH);
 
-  handle.frameWrap.style.width = `${w}px`;
-  handle.frameWrap.style.height = `${h}px`;
-  handle.frameWrap.style.transform = scale < 1 ? `scale(${scale})` : 'none';
-  handle.frameWrap.style.borderRadius = `${device.cornerRadius}px`;
+  // Apply chassis sizing
+  handle.chassis.style.width = `${chassisW}px`;
+  handle.chassis.style.height = `${chassisH}px`;
+  handle.chassis.style.padding = `${chassis.width}px`;
+  handle.chassis.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  handle.chassis.style.borderRadius = `${device.cornerRadius + chassis.width}px`;
+  handle.chassis.style.setProperty('--chassis', chassis.color);
+  handle.chassis.style.setProperty('--button', chassis.buttonColor);
 
-  // Browser chrome
-  const chrome = getChromeLayout(device);
+  // Inner screen rounding
+  handle.screen.style.borderRadius = `${device.cornerRadius}px`;
+
+  // Hardware buttons
+  const layout = getButtonLayout(device);
+  const buttons = handle.chassis.querySelectorAll<HTMLDivElement>('.btn');
+  // children order: silent, volUp, volDn, power
+  const order: Array<keyof typeof layout> = ['silent', 'volUp', 'volDn', 'power'];
+  buttons.forEach((btn, i) => {
+    const key = order[i];
+    if (!key) return;
+    const cfg = layout[key];
+    if (!cfg) {
+      btn.style.display = 'none';
+      return;
+    }
+    btn.style.display = 'block';
+    btn.style.top = `${cfg.top}px`;
+    btn.style.height = `${cfg.height}px`;
+  });
 
   // Status bar
   handle.statusBar.style.height = `${chrome.statusBarHeight}px`;
@@ -518,44 +720,71 @@ function applyState(handle: OverlayHandle): void {
     device.platform === 'ios' && device.notch?.type === 'dynamic-island',
   );
 
-  // URL bar styling per platform
-  handle.urlBar.classList.toggle('ios', device.platform === 'ios');
-  handle.urlBar.classList.toggle('android', device.platform === 'android');
-  handle.urlBar.classList.toggle('top', chrome.urlBarPosition === 'top');
-  handle.urlBar.classList.toggle('bottom', chrome.urlBarPosition === 'bottom');
-  handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
+  // URL bar variant + position
+  handle.urlBar.className = 'url-bar';
+  let floatingUrl = false;
+  if (chrome.urlBarPosition === 'top') {
+    handle.urlBar.classList.add('android', 'top');
+    handle.urlBar.style.position = '';
+    handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
+  } else if (device.platform === 'ios' && device.notch) {
+    // Floating liquid-glass pill (iOS 17+ Safari style)
+    handle.urlBar.classList.add('ios', 'floating');
+    floatingUrl = true;
+  } else {
+    // Classic iOS bottom bar (iPhone 5/SE)
+    handle.urlBar.classList.add('ios', 'classic');
+    handle.urlBar.style.position = '';
+    handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
+  }
   handle.urlText.textContent = safeHostPath();
 
   // Home indicator
-  handle.homeIndicator.style.display = chrome.homeIndicatorHeight > 0 ? 'flex' : 'none';
-  handle.homeIndicator.style.height = `${chrome.homeIndicatorHeight}px`;
-  handle.homeIndicator.classList.toggle('android', device.platform === 'android');
-
-  // Re-arrange chrome for bottom URL bar (iOS notched + classic)
-  // Order: statusBar -> iframe -> urlBar -> homeIndicator
-  // For Android (top URL): statusBar -> urlBar -> iframe -> homeIndicator
-  const wrap = handle.frameWrap;
-  wrap.appendChild(handle.statusBar);
-  if (chrome.urlBarPosition === 'top') {
-    wrap.appendChild(handle.urlBar);
-    wrap.appendChild(handle.iframe);
+  if (chrome.homeIndicatorHeight === 0) {
+    handle.homeIndicator.style.display = 'none';
   } else {
-    wrap.appendChild(handle.iframe);
-    wrap.appendChild(handle.urlBar);
+    handle.homeIndicator.style.display = 'flex';
+    handle.homeIndicator.classList.toggle('android', device.platform === 'android');
+    if (device.platform === 'ios' && device.notch) {
+      // Floats on top of content alongside the URL bar
+      handle.homeIndicator.classList.add('floating');
+      handle.homeIndicator.style.height = '';
+    } else {
+      handle.homeIndicator.classList.remove('floating');
+      handle.homeIndicator.style.height = `${chrome.homeIndicatorHeight}px`;
+    }
   }
-  wrap.appendChild(handle.homeIndicator);
-  wrap.appendChild(handle.notchEl); // notch always last so it overlays
 
-  // Iframe takes remaining space (set by flex: 1 1 auto)
-  handle.iframe.style.height = '';
+  // Re-arrange children:
+  //  - Android (top URL): status -> urlBar -> iframe -> homeIndicator
+  //  - iOS classic (bottom URL): status -> iframe -> urlBar
+  //  - iOS notched (floating URL + home): status -> iframe; urlBar/home overlay
+  const s = handle.screen;
+  s.appendChild(handle.statusBar);
+  if (chrome.urlBarPosition === 'top') {
+    s.appendChild(handle.urlBar);
+    s.appendChild(handle.iframe);
+    s.appendChild(handle.homeIndicator);
+  } else if (floatingUrl) {
+    s.appendChild(handle.iframe);
+    s.appendChild(handle.urlBar);
+    s.appendChild(handle.homeIndicator);
+  } else {
+    s.appendChild(handle.iframe);
+    s.appendChild(handle.urlBar);
+  }
+  s.appendChild(handle.notchEl);
 
   // Top label
   handle.topLabel.textContent = `${device.name}${
     handle.state.orientation === 'landscape' ? ' · landscape' : ''
   }`;
-  handle.topDims.textContent = `${w}×${h} @${device.devicePixelRatio}x`;
+  handle.topDims.textContent = `${screenW}×${screenH} @${device.devicePixelRatio}x`;
 
+  // Trigger loading state on URL bar when src changes
   if (handle.iframe.src !== window.location.href) {
+    handle.urlBar.classList.add('loading');
+    handle.urlBar.classList.remove('loading-done');
     handle.iframe.src = window.location.href;
   }
 

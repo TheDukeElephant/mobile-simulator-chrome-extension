@@ -29,3 +29,9 @@ build/
 # Logs
 *.log
 logs/
+
+# Reference / research material — not part of our source
+example/
+examples/
+reference/
+

@@ -30,6 +30,31 @@ export interface Device {
   cornerRadius: number;
   userAgent: string;
   notch?: DeviceNotch;
+  /** Optional override for the chassis bezel thickness (CSS px). */
+  bezelWidth?: number;
+  /** Optional override for the chassis colour. */
+  chassisColor?: string;
+}
+
+/** Resolved chassis settings with defaults applied. */
+export interface ChassisSpec {
+  /** Bezel thickness around the screen in CSS px. */
+  width: number;
+  /** Outer chassis colour. */
+  color: string;
+  /** Slightly lighter accent for side buttons. */
+  buttonColor: string;
+}
+
+export function getChassis(device: Device): ChassisSpec {
+  // iPhones with rounded corners have noticeably thinner bezels than
+  // older flat-edge designs; tablets get a slightly thicker bezel.
+  const defaultWidth = device.category === 'tablet' ? 16 : device.cornerRadius === 0 ? 14 : 11;
+  return {
+    width: device.bezelWidth ?? defaultWidth,
+    color: device.chassisColor ?? '#1d1d1f',
+    buttonColor: '#2c2c2e',
+  };
 }
 
 /**
@@ -59,9 +84,10 @@ export function getChromeLayout(device: Device): ChromeLayout {
   if (device.platform === 'ios') {
     if (device.notch) {
       // Modern iPhones (X and later): status bar around the notch / island,
-      // URL pill at the bottom, plus home indicator.
+      // URL pill floats at the bottom over the page (iOS 17+ Safari behaviour),
+      // plus the home indicator pill.
       return {
-        statusBarHeight: device.notch.type === 'dynamic-island' ? 59 : 44,
+        statusBarHeight: device.notch.type === 'dynamic-island' ? 54 : 44,
         urlBarHeight: 50,
         urlBarPosition: 'bottom',
         homeIndicatorHeight: 34,
