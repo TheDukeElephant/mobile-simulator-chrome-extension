@@ -2,10 +2,14 @@
 
 export type Orientation = 'portrait' | 'landscape';
 
+// Which mobile browser chrome to render (Safari vs Chrome iOS).
+export type BrowserMode = 'safari' | 'chrome';
+
 export interface EmulateStartMessage {
   type: 'EMULATE_START';
   deviceId: string;
   orientation: Orientation;
+  browser: BrowserMode;
 }
 
 export interface EmulateStopMessage {
@@ -21,6 +25,12 @@ export interface SelectDeviceMessage {
 // Sent from content script when the user toggles rotation in the overlay.
 export interface RotateMessage {
   type: 'ROTATE';
+}
+
+// Sent from content script when the user picks a different browser chrome.
+export interface SelectBrowserMessage {
+  type: 'SELECT_BROWSER';
+  browser: BrowserMode;
 }
 
 export interface EmulateStatusRequest {
@@ -45,4 +55,5 @@ export type ExtensionMessage =
   | EmulateStatusResponse
   | EmulateStoppedNotice
   | SelectDeviceMessage
-  | RotateMessage;
+  | RotateMessage
+  | SelectBrowserMessage;

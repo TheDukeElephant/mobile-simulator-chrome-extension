@@ -6,11 +6,13 @@ import {
   type Device,
 } from '../devices';
 import type {
+  BrowserMode,
   EmulateStartMessage,
   EmulateStoppedNotice,
   ExtensionMessage,
   Orientation,
   RotateMessage,
+  SelectBrowserMessage,
   SelectDeviceMessage,
 } from '../shared/messages';
 
@@ -28,19 +30,29 @@ interface OverlayHandle {
   urlBar: HTMLElement;
   urlText: HTMLElement;
   loadingBar: HTMLElement;
-  iosToolbar: HTMLElement;
+  iosBottomBar: HTMLElement;   // Safari iOS unified bottom bar
+  iosUrlText: HTMLElement;     // Safari url text inside the bottom bar
+  iosToolbar: HTMLElement;     // legacy, hidden
+  chromeTopBar: HTMLElement;   // Chrome iOS top URL bar (lens + url + share)
+  chromeUrlText: HTMLElement;  // Chrome iOS url text
+  chromeBottomBar: HTMLElement; // Chrome iOS 5-icon nav (back/fwd/+/tabs/more)
   homeIndicator: HTMLElement;
   topLabel: HTMLElement;
   topDims: HTMLElement;
   pickerPanel: HTMLElement;
   pickerList: HTMLElement;
   pickerSearch: HTMLInputElement;
-  state: { deviceId: string; orientation: Orientation };
+  browserBtn: HTMLButtonElement;
+  state: { deviceId: string; orientation: Orientation; browser: BrowserMode };
 }
 
 let overlay: OverlayHandle | null = null;
 
-function buildOverlay(initialDeviceId: string, initialOrientation: Orientation): OverlayHandle {
+function buildOverlay(
+  initialDeviceId: string,
+  initialOrientation: Orientation,
+  initialBrowser: BrowserMode,
+): OverlayHandle {
   const root = document.createElement('div');
   root.id = ROOT_ID;
   document.documentElement.appendChild(root);
@@ -233,96 +245,159 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     .url-bar.ios.classic svg { color: #1f2329; }
     .url-bar .lock { width: 12px; height: 12px; }
 
-    /* iOS notched: floating "liquid glass" capsule with Aa + URL + reload
-       (matches iOS 17 Safari bottom bar layout) */
-    .url-bar.ios.floating {
+    /* ============================================================
+       iOS Safari bottom chrome (notched iPhones, iOS 15+)
+       Real layout: one unified bottom bar = URL capsule on top +
+       5 nav icons on bottom, all sitting above the home indicator.
+       The bar itself has a frosted-glass / translucent background
+       that bleeds into content below it (like real Safari).
+       ============================================================ */
+
+    /* The outer bottom-bar container — replaces the old url-bar.floating
+       AND ios-toolbar; both are children of this one element now. */
+    .ios-bottom-bar {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 56px;
-      width: calc(100% - 16px);
-      max-width: 420px;
-      height: 44px;
-      padding: 0 6px;
-      background: rgba(248, 248, 248, 0.72);
-      border: 0.5px solid rgba(0, 0, 0, 0.06);
-      border-radius: 999px;
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      box-shadow:
-        0 6px 20px rgba(0, 0, 0, 0.12),
-        0 1px 0 rgba(255, 255, 255, 0.85) inset;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      /* 44px url row + 44px nav row + 4px gap + 20px home-indicator area */
+      height: 112px;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0 0 20px;   /* 20px at bottom = space for home indicator */
+      /* glass background — bleeds into content */
+      background: linear-gradient(
+        to bottom,
+        rgba(242, 242, 247, 0) 0%,
+        rgba(242, 242, 247, 0.82) 18%,
+        rgba(242, 242, 247, 0.94) 100%
+      );
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      /* very subtle top separator line */
+      border-top: 0.5px solid rgba(0, 0, 0, 0.12);
       z-index: 4;
-      gap: 0;
+      pointer-events: none;
     }
-    .url-bar.ios.floating .pill {
+    .ios-bottom-bar.visible { display: flex; }
+
+    /* ---- URL capsule row ---- */
+    .ios-url-row {
+      flex: 0 0 44px;
+      display: flex;
+      align-items: center;
+      padding: 6px 8px 2px;
+    }
+    .ios-url-capsule {
       flex: 1;
-      background: transparent;
-      border: none;
-      padding: 0;
+      height: 34px;
       display: flex;
       align-items: center;
       gap: 0;
-      overflow: visible;
+      padding: 0 6px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+      /* subtle inner highlight */
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08),
+        0 0.5px 0 rgba(255, 255, 255, 0.9) inset;
+      overflow: hidden;
+      position: relative;
     }
-    .url-bar.ios.floating .aa-btn,
-    .url-bar.ios.floating .reload-btn {
+    .ios-url-capsule .aa-btn {
       flex: 0 0 auto;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: transparent;
       border: 0;
       border-radius: 999px;
-      color: #1f2329;
+      color: #3c3c43;
       cursor: default;
       padding: 0;
+      font-weight: 600;
+      line-height: 1;
+      gap: 1px;
     }
-    .url-bar.ios.floating .aa-btn { font-weight: 600; line-height: 1; gap: 1px; }
-    .url-bar.ios.floating .aa-btn .aa-small { font-size: 11px; }
-    .url-bar.ios.floating .aa-btn .aa-big { font-size: 15px; }
-    .url-bar.ios.floating .reload-btn svg { width: 16px; height: 16px; }
-    .url-bar.ios.floating .url-content {
+    .ios-url-capsule .aa-btn .aa-small { font-size: 10px; }
+    .ios-url-capsule .aa-btn .aa-big  { font-size: 14px; }
+    .ios-url-capsule .url-content {
       flex: 1 1 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       min-width: 0;
-      padding: 0 4px;
-      color: #1f2329;
-      font-size: 14px;
+      padding: 0 2px;
+      color: #1c1c1e;
+      font-size: 13px;
       font-weight: 400;
+      letter-spacing: -0.01em;
       overflow: hidden;
     }
-    .url-bar.ios.floating .url-content .url-text {
+    .ios-url-capsule .url-content .url-text {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .url-bar.ios.floating .lock { width: 11px; height: 11px; flex-shrink: 0; color: #1f2329; }
-
-    /* iOS bottom action toolbar (back / forward / share / bookmarks / tabs) */
-    .ios-toolbar {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 50px;
-      padding: 0 22px 14px;
-      display: none;
+    .ios-url-capsule .lock { width: 10px; height: 10px; flex-shrink: 0; color: #3c3c43; }
+    .ios-url-capsule .reload-btn {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.55) 60%, rgba(248, 248, 248, 0.7) 100%);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      z-index: 3;
+      justify-content: center;
+      background: transparent;
+      border: 0;
+      border-radius: 999px;
+      color: #3c3c43;
+      cursor: default;
+      padding: 0;
+    }
+    .ios-url-capsule .reload-btn svg { width: 15px; height: 15px; }
+
+    /* Loading progress bar — runs along the bottom edge of the capsule */
+    .ios-url-capsule .loading-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: #007aff;
+      border-radius: 1px;
+      opacity: 0;
       pointer-events: none;
     }
-    .ios-toolbar.visible { display: flex; }
-    .ios-toolbar .tool {
+    /* Stage 1: page starts loading — bar animates to 40% */
+    .ios-bottom-bar.loading .loading-bar {
+      animation: lb-init 2s ease forwards;
+    }
+    /* Stage 2: DOM interactive — bar moves to 70% */
+    .ios-bottom-bar.loading-interactive .loading-bar {
+      animation: lb-interactive 0.8s ease forwards;
+    }
+    /* Stage 3: load complete — bar races to 100% then fades */
+    .ios-bottom-bar.loading-done .loading-bar {
+      animation: lb-complete 0.6s ease forwards;
+    }
+    @keyframes lb-init        { from { width: 0%;  opacity: 1; } to { width: 40%; opacity: 1; } }
+    @keyframes lb-interactive { from { width: 40%; opacity: 1; } to { width: 70%; opacity: 1; } }
+    @keyframes lb-complete    { 0%   { width: 70%; opacity: 1; } 70% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
+
+    /* ---- Nav icon row ---- */
+    .ios-nav-row {
+      flex: 0 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .ios-nav-row .tool {
       width: 36px;
       height: 36px;
       display: inline-flex;
@@ -330,23 +405,145 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       justify-content: center;
       color: #007aff;
     }
-    .ios-toolbar .tool.disabled { color: #c5c7cc; }
-    .ios-toolbar .tool svg { width: 22px; height: 22px; }
+    .ios-nav-row .tool.disabled { color: #c7c7cc; }
+    .ios-nav-row .tool svg { width: 22px; height: 22px; }
 
-    /* Loading progress bar inside the URL bar */
+    /* Legacy url-bar kept for Android / iOS classic — hide the floating variant */
+    .url-bar.ios.floating { display: none !important; }
+
+    /* iOS bottom action toolbar — now replaced by ios-bottom-bar, keep hidden */
+    .ios-toolbar {
+      display: none !important;
+    }
+
+    /* ============================================================
+       Chrome on iOS — top URL bar (lens + url + share) and bottom
+       5-icon nav (back, forward, +, tabs(N), more). Both always
+       visible (we can't observe iframe scroll cross-origin).
+       ============================================================ */
+
+    /* Top URL bar — sits directly under the status bar */
+    .chrome-top-bar {
+      flex: 0 0 auto;
+      width: 100%;
+      display: none;
+      align-items: center;
+      padding: 6px 12px 8px;
+      background: #ffffff;
+      position: relative;
+      z-index: 2;
+      border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+    }
+    .chrome-top-bar.visible { display: flex; }
+    .chrome-top-bar .pill {
+      flex: 1;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 6px;
+      background: #eeeff1;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .chrome-top-bar .lens-btn,
+    .chrome-top-bar .share-btn {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #5f6368;
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+    .chrome-top-bar .lens-btn svg,
+    .chrome-top-bar .share-btn svg { width: 18px; height: 18px; }
+    .chrome-top-bar .url-content {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      padding: 0 4px;
+      color: #1f2329;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      overflow: hidden;
+    }
+    .chrome-top-bar .url-content .url-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Bottom 5-icon nav bar */
+    .chrome-bottom-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      /* 50px nav row + 20px home-indicator area */
+      height: 70px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px 20px;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.85) 22%,
+        rgba(255, 255, 255, 0.96) 100%
+      );
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+      z-index: 4;
+      pointer-events: none;
+    }
+    .chrome-bottom-bar.visible { display: flex; }
+    .chrome-bottom-bar .nav-btn {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #3c4043;
+      position: relative;
+    }
+    .chrome-bottom-bar .nav-btn.disabled { color: #c0c2c5; }
+    .chrome-bottom-bar .nav-btn svg { width: 26px; height: 26px; }
+    /* Tab counter sits inside the tabs square */
+    .chrome-bottom-bar .nav-btn .tab-count {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 600;
+      color: #3c4043;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    /* Keep non-floating url-bar styles intact */
+    .url-bar.ios.floating-UNUSED {
+      /* placeholder — never applied */
+    }
+
+    /* Loading progress bar for non-floating url bars (Android / iOS classic) */
     .loading-bar {
       position: absolute;
       bottom: 0;
       left: 0;
       height: 2px;
       width: 0%;
-      background: #2f81f7;
+      background: #007aff;
       border-radius: 1px;
       opacity: 0;
       transition: width 0.4s ease, opacity 0.3s ease;
       pointer-events: none;
     }
-    .url-bar.ios.floating .loading-bar { bottom: 4px; left: 14px; right: 14px; width: auto; }
     .url-bar.loading .loading-bar { width: 70%; opacity: 1; }
     .url-bar.loading-done .loading-bar { width: 100%; opacity: 0; }
 
@@ -378,9 +575,15 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       position: absolute;
       left: 0; right: 0;
       bottom: 0;
-      z-index: 4;
+      z-index: 6;  /* above ios-bottom-bar */
     }
-    .home-indicator.floating .pill { background: #1f2329; opacity: 0.85; }
+    .home-indicator.floating .pill {
+      background: #1c1c1e;
+      opacity: 0.9;
+      width: 134px;
+      height: 5px;
+      margin: 7px 0 8px;
+    }
 
     iframe {
       flex: 1 1 auto;
@@ -550,15 +753,83 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   loadingBar.className = 'loading-bar';
   urlBar.appendChild(loadingBar);
 
-  // iOS bottom action toolbar (back / forward / share / bookmarks / tabs)
-  const iosToolbar = document.createElement('div');
-  iosToolbar.className = 'ios-toolbar';
-  iosToolbar.innerHTML = `
-    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></span>
-    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+  // iOS bottom bar (replaces separate url-bar.floating + ios-toolbar for notched iPhones)
+  const iosBottomBar = document.createElement('div');
+  iosBottomBar.className = 'ios-bottom-bar';
+
+  // URL row inside the bottom bar
+  const iosUrlRow = document.createElement('div');
+  iosUrlRow.className = 'ios-url-row';
+  const iosUrlCapsule = document.createElement('div');
+  iosUrlCapsule.className = 'ios-url-capsule';
+  iosUrlCapsule.innerHTML = `
+    <button class="aa-btn" tabindex="-1" aria-hidden="true"><span class="aa-small">A</span><span class="aa-big">A</span></button>
+    <div class="url-content">
+      <svg class="lock" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M3 5V4a3 3 0 0 1 6 0v1h1v6H2V5h1zm1 0h4V4a2 2 0 0 0-4 0v1z"/></svg>
+      <span class="url-text"></span>
+    </div>
+    <button class="reload-btn" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><polyline points="13.5 2 13.5 5 10.5 5"/></svg>
+    </button>
+    <div class="loading-bar"></div>
+  `;
+  const iosUrlText = iosUrlCapsule.querySelector('.url-text') as HTMLSpanElement;
+  iosUrlRow.appendChild(iosUrlCapsule);
+  iosBottomBar.appendChild(iosUrlRow);
+
+  // Nav icon row inside the bottom bar
+  const iosNavRow = document.createElement('div');
+  iosNavRow.className = 'ios-nav-row';
+  iosNavRow.innerHTML = `
+    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></span>
+    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
     <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
     <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg></span>
     <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="13" height="13" rx="2"/><rect x="7" y="4" width="13" height="13" rx="2"/></svg></span>
+  `;
+  iosBottomBar.appendChild(iosNavRow);
+
+  // iOS bottom action toolbar (kept in DOM for compat, but hidden by CSS)
+  const iosToolbar = document.createElement('div');
+  iosToolbar.className = 'ios-toolbar';
+
+  // Chrome iOS — top URL bar (lens + url + share)
+  const chromeTopBar = document.createElement('div');
+  chromeTopBar.className = 'chrome-top-bar';
+  const chromeTopPill = document.createElement('div');
+  chromeTopPill.className = 'pill';
+  chromeTopPill.innerHTML = `
+    <button class="lens-btn" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+    </button>
+    <div class="url-content"><span class="url-text"></span></div>
+    <button class="share-btn" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+    </button>
+  `;
+  const chromeUrlText = chromeTopPill.querySelector('.url-text') as HTMLSpanElement;
+  chromeTopBar.appendChild(chromeTopPill);
+
+  // Chrome iOS — bottom 5-icon nav (back / forward / + / tabs(3) / more)
+  const chromeBottomBar = document.createElement('div');
+  chromeBottomBar.className = 'chrome-bottom-bar';
+  chromeBottomBar.innerHTML = `
+    <span class="nav-btn disabled" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="12" x2="5" y2="12"/><polyline points="11 18 5 12 11 6"/></svg>
+    </span>
+    <span class="nav-btn disabled" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 18 19 12 13 6"/></svg>
+    </span>
+    <span class="nav-btn" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="13" fill="#dadce0" stroke="#dadce0"/><line x1="16" y1="9" x2="16" y2="23" stroke="#3c4043"/><line x1="9" y1="16" x2="23" y2="16" stroke="#3c4043"/></svg>
+    </span>
+    <span class="nav-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
+      <span class="tab-count">3</span>
+    </span>
+    <span class="nav-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+    </span>
   `;
 
   // Iframe
@@ -581,9 +852,12 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   notchEl.className = 'notch';
 
   screen.appendChild(statusBar);
+  screen.appendChild(chromeTopBar);
   screen.appendChild(urlBar);
   screen.appendChild(iframe);
   screen.appendChild(iosToolbar);
+  screen.appendChild(iosBottomBar);
+  screen.appendChild(chromeBottomBar);
   screen.appendChild(homeIndicator);
   screen.appendChild(notchEl);
 
@@ -633,11 +907,19 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     chrome.runtime.sendMessage({ type: 'ROTATE' } satisfies RotateMessage);
   });
 
+  const browserBtn = makeIconButton(ICONS.safari, 'Switch browser (Safari / Chrome)');
+  browserBtn.addEventListener('click', () => {
+    if (!overlay) return;
+    const next: BrowserMode = overlay.state.browser === 'safari' ? 'chrome' : 'safari';
+    chrome.runtime.sendMessage({ type: 'SELECT_BROWSER', browser: next } satisfies SelectBrowserMessage);
+  });
+
   sidebar.appendChild(closeBtn);
   const spacer = document.createElement('div');
   spacer.className = 'spacer';
   sidebar.appendChild(changeBtn);
   sidebar.appendChild(rotateBtn);
+  sidebar.appendChild(browserBtn);
   sidebar.appendChild(spacer);
 
   backdrop.appendChild(topbar);
@@ -652,11 +934,24 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     changeBtn.classList.remove('active');
   });
 
-  // Loading bar wired to iframe load lifecycle
+  // Loading bar wired to iframe load lifecycle (3-stage for iOS bottom bar)
+  let loadStage: ReturnType<typeof setTimeout> | null = null;
   iframe.addEventListener('load', () => {
+    if (loadStage) clearTimeout(loadStage);
+    // Stage 2: interactive
+    iosBottomBar.classList.remove('loading');
+    iosBottomBar.classList.add('loading-interactive');
     urlBar.classList.remove('loading');
     urlBar.classList.add('loading-done');
-    setTimeout(() => urlBar.classList.remove('loading-done'), 350);
+    loadStage = setTimeout(() => {
+      // Stage 3: complete
+      iosBottomBar.classList.remove('loading-interactive');
+      iosBottomBar.classList.add('loading-done');
+      loadStage = setTimeout(() => {
+        iosBottomBar.classList.remove('loading-done');
+        urlBar.classList.remove('loading-done');
+      }, 700);
+    }, 400);
   });
 
   return {
@@ -671,14 +966,20 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     urlBar,
     urlText,
     loadingBar,
+    iosBottomBar,
+    iosUrlText,
     iosToolbar,
+    chromeTopBar,
+    chromeUrlText,
+    chromeBottomBar,
     homeIndicator,
     topLabel,
     topDims,
     pickerPanel,
     pickerList,
     pickerSearch,
-    state: { deviceId: initialDeviceId, orientation: initialOrientation },
+    browserBtn,
+    state: { deviceId: initialDeviceId, orientation: initialOrientation, browser: initialBrowser },
   };
 }
 
@@ -686,6 +987,7 @@ const ICONS = {
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
   devices: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="11" y1="18" x2="13" y2="18"/></svg>`,
   rotate: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>`,
+  safari: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="14.5 9.5 9.5 14.5 9.5 9.5" fill="currentColor"/></svg>`,
 };
 
 function makeIconButton(svg: string, title: string): HTMLButtonElement {
@@ -827,21 +1129,29 @@ function applyState(handle: OverlayHandle): void {
   // URL bar variant + position
   handle.urlBar.className = 'url-bar';
   let floatingUrl = false;
+  let chromeIosLayout = false;
   if (chrome.urlBarPosition === 'top') {
     handle.urlBar.classList.add('android', 'top');
     handle.urlBar.style.position = '';
     handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
   } else if (device.platform === 'ios' && device.notch) {
-    // Floating liquid-glass pill (iOS 17+ Safari style)
-    handle.urlBar.classList.add('ios', 'floating');
-    floatingUrl = true;
+    if (handle.state.browser === 'chrome') {
+      // Chrome iOS: top URL bar + bottom 5-icon nav
+      chromeIosLayout = true;
+    } else {
+      // Safari iOS: unified bottom bar
+      handle.urlBar.classList.add('ios', 'floating');
+      floatingUrl = true;
+    }
   } else {
-    // Classic iOS bottom bar (iPhone 5/SE)
+    // Classic iOS bottom bar (iPhone 5/SE) — both Safari and Chrome use this
     handle.urlBar.classList.add('ios', 'classic');
     handle.urlBar.style.position = '';
     handle.urlBar.style.height = `${chrome.urlBarHeight}px`;
   }
   handle.urlText.textContent = safeHostPath();
+  handle.iosUrlText.textContent = safeHostPath();
+  handle.chromeUrlText.textContent = safeHostPath();
 
   // Home indicator
   if (chrome.homeIndicatorHeight === 0) {
@@ -859,29 +1169,50 @@ function applyState(handle: OverlayHandle): void {
     }
   }
 
-  // Re-arrange children:
+  // Re-arrange children based on platform + browser:
   //  - Android (top URL): status -> urlBar -> iframe -> homeIndicator
   //  - iOS classic (bottom URL): status -> iframe -> urlBar
-  //  - iOS notched (floating URL + toolbar + home): status -> iframe; rest overlay
+  //  - iOS notched + Safari: status -> iframe; ios-bottom-bar + home overlay
+  //  - iOS notched + Chrome: status -> chromeTopBar -> iframe; chrome-bottom-bar + home overlay
   const s = handle.screen;
   s.appendChild(handle.statusBar);
   if (chrome.urlBarPosition === 'top') {
     s.appendChild(handle.urlBar);
     s.appendChild(handle.iframe);
     s.appendChild(handle.homeIndicator);
-    handle.iosToolbar.classList.remove('visible');
+    handle.iosBottomBar.classList.remove('visible');
+    handle.chromeTopBar.classList.remove('visible');
+    handle.chromeBottomBar.classList.remove('visible');
+  } else if (chromeIosLayout) {
+    s.appendChild(handle.chromeTopBar);
+    s.appendChild(handle.iframe);
+    s.appendChild(handle.chromeBottomBar);
+    s.appendChild(handle.homeIndicator);
+    handle.chromeTopBar.classList.add('visible');
+    handle.chromeBottomBar.classList.add('visible');
+    handle.iosBottomBar.classList.remove('visible');
   } else if (floatingUrl) {
     s.appendChild(handle.iframe);
-    s.appendChild(handle.urlBar);
-    s.appendChild(handle.iosToolbar);
+    s.appendChild(handle.iosBottomBar);
     s.appendChild(handle.homeIndicator);
-    handle.iosToolbar.classList.add('visible');
+    handle.iosBottomBar.classList.add('visible');
+    handle.chromeTopBar.classList.remove('visible');
+    handle.chromeBottomBar.classList.remove('visible');
   } else {
     s.appendChild(handle.iframe);
     s.appendChild(handle.urlBar);
-    handle.iosToolbar.classList.remove('visible');
+    handle.iosBottomBar.classList.remove('visible');
+    handle.chromeTopBar.classList.remove('visible');
+    handle.chromeBottomBar.classList.remove('visible');
   }
   s.appendChild(handle.notchEl);
+
+  // Browser toggle button visual state
+  handle.browserBtn.classList.toggle('active', handle.state.browser === 'chrome');
+  handle.browserBtn.title =
+    handle.state.browser === 'safari'
+      ? 'Browser: Safari (click to switch to Chrome)'
+      : 'Browser: Chrome (click to switch to Safari)';
 
   // Top label
   handle.topLabel.textContent = `${device.name}${
@@ -893,6 +1224,9 @@ function applyState(handle: OverlayHandle): void {
   if (handle.iframe.src !== window.location.href) {
     handle.urlBar.classList.add('loading');
     handle.urlBar.classList.remove('loading-done');
+    // Stage 1: bar starts animating on the bottom bar
+    handle.iosBottomBar.classList.remove('loading-interactive', 'loading-done');
+    handle.iosBottomBar.classList.add('loading');
     handle.iframe.src = window.location.href;
   }
 
@@ -986,19 +1320,19 @@ function onKeydown(e: KeyboardEvent): void {
   }
 }
 
-function start(deviceId: string, orientation: Orientation): void {
+function start(deviceId: string, orientation: Orientation, browser: BrowserMode): void {
   const device = getDeviceById(deviceId);
   if (!device) return;
 
   if (!overlay) {
-    overlay = buildOverlay(deviceId, orientation);
+    overlay = buildOverlay(deviceId, orientation, browser);
     overlay.pickerSearch.addEventListener('input', () => {
       renderPicker(overlay!, overlay!.pickerSearch.value);
     });
     window.addEventListener('resize', onResize);
     window.addEventListener('keydown', onKeydown);
   } else {
-    overlay.state = { deviceId, orientation };
+    overlay.state = { deviceId, orientation, browser };
   }
   applyState(overlay);
 }
@@ -1008,7 +1342,7 @@ chrome.runtime.onMessage.addListener((rawMessage) => {
   switch (msg.type) {
     case 'EMULATE_START': {
       const m = msg as EmulateStartMessage;
-      start(m.deviceId, m.orientation);
+      start(m.deviceId, m.orientation, m.browser);
       break;
     }
     case 'EMULATE_STOP':

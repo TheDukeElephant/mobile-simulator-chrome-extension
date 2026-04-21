@@ -1,21 +1,25 @@
 import { addBypassRulesForTab, removeBypassRulesForTab } from './dnr-rules';
 import { getDeviceById } from '../devices';
 import type {
+  BrowserMode,
   EmulateStartMessage,
   EmulateStopMessage,
   EmulateStatusResponse,
   ExtensionMessage,
   Orientation,
+  SelectBrowserMessage,
   SelectDeviceMessage,
 } from '../shared/messages';
 
 const LAST_DEVICE_KEY = 'lastDeviceId';
 const LAST_ORIENTATION_KEY = 'lastOrientation';
+const LAST_BROWSER_KEY = 'lastBrowser';
 const DEFAULT_DEVICE_ID = 'iphone-15';
 
 interface TabState {
   deviceId: string;
   orientation: Orientation;
+  browser: BrowserMode;
 }
 
 const tabStates = new Map<number, TabState>();
@@ -38,10 +42,21 @@ async function getDefaultOrientation(): Promise<Orientation> {
   return o === 'landscape' ? 'landscape' : 'portrait';
 }
 
-async function persistState(deviceId: string, orientation: Orientation): Promise<void> {
+async function getDefaultBrowser(): Promise<BrowserMode> {
+  const stored = await chrome.storage.local.get(LAST_BROWSER_KEY);
+  const b = stored[LAST_BROWSER_KEY] as BrowserMode | undefined;
+  return b === 'chrome' ? 'chrome' : 'safari';
+}
+
+async function persistState(
+  deviceId: string,
+  orientation: Orientation,
+  browser: BrowserMode,
+): Promise<void> {
   await chrome.storage.local.set({
     [LAST_DEVICE_KEY]: deviceId,
     [LAST_ORIENTATION_KEY]: orientation,
+    [LAST_BROWSER_KEY]: browser,
   });
 }
 
@@ -49,12 +64,13 @@ async function startEmulation(
   tabId: number,
   deviceId: string,
   orientation: Orientation,
+  browser: BrowserMode,
 ): Promise<void> {
   const device = getDeviceById(deviceId);
   if (!device) return;
 
-  tabStates.set(tabId, { deviceId, orientation });
-  await persistState(deviceId, orientation);
+  tabStates.set(tabId, { deviceId, orientation, browser });
+  await persistState(deviceId, orientation, browser);
   await addBypassRulesForTab(tabId);
 
   try {
@@ -62,6 +78,7 @@ async function startEmulation(
       type: 'EMULATE_START',
       deviceId,
       orientation,
+      browser,
     } satisfies EmulateStartMessage);
   } catch {
     // Content script may not be ready (e.g. chrome:// page). Surface as no-op.
@@ -96,7 +113,8 @@ chrome.action.onClicked.addListener((tab) => {
     void (async () => {
       const deviceId = await getDefaultDeviceId();
       const orientation = await getDefaultOrientation();
-      await startEmulation(tabId, deviceId, orientation);
+      const browser = await getDefaultBrowser();
+      await startEmulation(tabId, deviceId, orientation, browser);
     })();
   }
 });
@@ -113,8 +131,8 @@ chrome.runtime.onMessage.addListener((rawMessage, sender, sendResponse) => {
     case 'EMULATE_START': {
       if (tabId === undefined) return false;
       const startMsg = msg as EmulateStartMessage;
-      void startEmulation(tabId, startMsg.deviceId, startMsg.orientation).then(() =>
-        sendResponse({ ok: true }),
+      void startEmulation(tabId, startMsg.deviceId, startMsg.orientation, startMsg.browser).then(
+        () => sendResponse({ ok: true }),
       );
       return true;
     }
@@ -129,9 +147,27 @@ chrome.runtime.onMessage.addListener((rawMessage, sender, sendResponse) => {
       const selectMsg = msg as SelectDeviceMessage;
       const current = tabStates.get(tabId);
       const orientation = current?.orientation ?? 'portrait';
-      void startEmulation(tabId, selectMsg.deviceId, orientation).then(() =>
-        sendResponse({ ok: true }),
-      );
+      void (async () => {
+        const browser = current?.browser ?? (await getDefaultBrowser());
+        await startEmulation(tabId, selectMsg.deviceId, orientation, browser);
+        sendResponse({ ok: true });
+      })();
+      return true;
+    }
+    case 'SELECT_BROWSER': {
+      if (tabId === undefined) return false;
+      const browserMsg = msg as SelectBrowserMessage;
+      const current = tabStates.get(tabId);
+      if (!current) {
+        sendResponse({ ok: false });
+        return false;
+      }
+      void startEmulation(
+        tabId,
+        current.deviceId,
+        current.orientation,
+        browserMsg.browser,
+      ).then(() => sendResponse({ ok: true }));
       return true;
     }
     case 'ROTATE': {
@@ -142,7 +178,9 @@ chrome.runtime.onMessage.addListener((rawMessage, sender, sendResponse) => {
         return false;
       }
       const next: Orientation = current.orientation === 'portrait' ? 'landscape' : 'portrait';
-      void startEmulation(tabId, current.deviceId, next).then(() => sendResponse({ ok: true }));
+      void startEmulation(tabId, current.deviceId, next, current.browser).then(() =>
+        sendResponse({ ok: true }),
+      );
       return true;
     }
     case 'EMULATE_STATUS_REQUEST': {
@@ -184,6 +222,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
         type: 'EMULATE_START',
         deviceId: state.deviceId,
         orientation: state.orientation,
+        browser: state.browser,
       } satisfies EmulateStartMessage)
       .catch(() => {
         // ignore (e.g. navigated to chrome://)
