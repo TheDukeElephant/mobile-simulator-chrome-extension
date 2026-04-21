@@ -28,6 +28,7 @@ interface OverlayHandle {
   urlBar: HTMLElement;
   urlText: HTMLElement;
   loadingBar: HTMLElement;
+  iosToolbar: HTMLElement;
   homeIndicator: HTMLElement;
   topLabel: HTMLElement;
   topDims: HTMLElement;
@@ -169,25 +170,28 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 22px;
-      font-size: 15px;
+      padding: 0 26px;
+      font-size: 16px;
       font-weight: 600;
       color: #000000;
       background: #ffffff;
       position: relative;
       z-index: 2;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      font-feature-settings: 'tnum';
     }
-    .status-bar.ios-island { padding-top: 6px; align-items: flex-start; padding-left: 28px; padding-right: 28px; }
-    .status-bar.ios-island .status-time { padding-top: 14px; }
-    .status-bar.ios-island .status-right { padding-top: 14px; }
+    .status-bar.ios-island { padding-top: 8px; align-items: flex-start; padding-left: 32px; padding-right: 32px; }
+    .status-bar.ios-island .status-time { padding-top: 16px; font-size: 17px; }
+    .status-bar.ios-island .status-right { padding-top: 18px; }
     .status-bar .status-right {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      font-weight: 500;
+      gap: 6px;
     }
-    .status-bar .icon { width: 16px; height: 12px; }
+    .status-bar .icon { display: block; }
+    .status-bar .icon-signal { width: 18px; height: 11px; }
+    .status-bar .icon-wifi { width: 17px; height: 12px; }
+    .status-bar .icon-battery { width: 27px; height: 12px; }
 
     /* === URL bar variants === */
     .url-bar {
@@ -229,37 +233,105 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     .url-bar.ios.classic svg { color: #1f2329; }
     .url-bar .lock { width: 12px; height: 12px; }
 
-    /* iOS notched: floating "liquid glass" pill overlaid on top of content */
+    /* iOS notched: floating "liquid glass" capsule with Aa + URL + reload
+       (matches iOS 17 Safari bottom bar layout) */
     .url-bar.ios.floating {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      bottom: 14px;
+      bottom: 56px;
       width: calc(100% - 16px);
-      max-width: 410px;
-      height: 50px;
-      padding: 0 8px;
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      max-width: 420px;
+      height: 44px;
+      padding: 0 6px;
+      background: rgba(248, 248, 248, 0.72);
+      border: 0.5px solid rgba(0, 0, 0, 0.06);
       border-radius: 999px;
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
       box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.18),
-        0 1px 0 rgba(255, 255, 255, 0.7) inset;
+        0 6px 20px rgba(0, 0, 0, 0.12),
+        0 1px 0 rgba(255, 255, 255, 0.85) inset;
       z-index: 4;
+      gap: 0;
     }
     .url-bar.ios.floating .pill {
       flex: 1;
       background: transparent;
       border: none;
-      justify-content: center;
-      color: #1f2329;
-      font-weight: 500;
-      font-size: 14px;
-      padding: 0 14px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow: visible;
     }
-    .url-bar.ios.floating svg { color: #1f2329; }
+    .url-bar.ios.floating .aa-btn,
+    .url-bar.ios.floating .reload-btn {
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 0;
+      border-radius: 999px;
+      color: #1f2329;
+      cursor: default;
+      padding: 0;
+    }
+    .url-bar.ios.floating .aa-btn { font-weight: 600; line-height: 1; gap: 1px; }
+    .url-bar.ios.floating .aa-btn .aa-small { font-size: 11px; }
+    .url-bar.ios.floating .aa-btn .aa-big { font-size: 15px; }
+    .url-bar.ios.floating .reload-btn svg { width: 16px; height: 16px; }
+    .url-bar.ios.floating .url-content {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 0 4px;
+      color: #1f2329;
+      font-size: 14px;
+      font-weight: 400;
+      overflow: hidden;
+    }
+    .url-bar.ios.floating .url-content .url-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .url-bar.ios.floating .lock { width: 11px; height: 11px; flex-shrink: 0; color: #1f2329; }
+
+    /* iOS bottom action toolbar (back / forward / share / bookmarks / tabs) */
+    .ios-toolbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 50px;
+      padding: 0 22px 14px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.55) 60%, rgba(248, 248, 248, 0.7) 100%);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .ios-toolbar.visible { display: flex; }
+    .ios-toolbar .tool {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #007aff;
+    }
+    .ios-toolbar .tool.disabled { color: #c5c7cc; }
+    .ios-toolbar .tool svg { width: 22px; height: 22px; }
 
     /* Loading progress bar inside the URL bar */
     .loading-bar {
@@ -437,9 +509,22 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   const statusRight = document.createElement('span');
   statusRight.className = 'status-right';
   statusRight.innerHTML = `
-    <svg class="icon" viewBox="0 0 18 12" fill="currentColor"><path d="M1 9h2v2H1zm4-2h2v4H5zm4-2h2v6H9zm4-2h2v8h-2z"/></svg>
-    <svg class="icon" viewBox="0 0 18 12" fill="currentColor"><path d="M9 2C5.5 2 2.7 4.3 1 6.5l1.4 1.1C3.9 5.6 6.3 4 9 4s5.1 1.6 6.6 3.6L17 6.5C15.3 4.3 12.5 2 9 2zm0 4c-1.7 0-3.2.9-4 2l1.4 1c.6-.7 1.6-1 2.6-1s2 .3 2.6 1L13 8c-.8-1.1-2.3-2-4-2z"/></svg>
-    <svg class="icon" viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="2" width="20" height="8" rx="2"/><rect x="2.5" y="3.5" width="15" height="5" fill="currentColor" stroke="none"/><rect x="22" y="4.5" width="1.5" height="3" fill="currentColor" stroke="none"/></svg>
+    <svg class="icon icon-signal" viewBox="0 0 18 11" fill="currentColor" aria-hidden="true">
+      <rect x="0"  y="7"   width="3" height="4"   rx="0.8"/>
+      <rect x="5"  y="5"   width="3" height="6"   rx="0.8"/>
+      <rect x="10" y="2.5" width="3" height="8.5" rx="0.8"/>
+      <rect x="15" y="0"   width="3" height="11"  rx="0.8"/>
+    </svg>
+    <svg class="icon icon-wifi" viewBox="0 0 17 12" fill="currentColor" aria-hidden="true">
+      <path d="M8.5 11.4a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z"/>
+      <path d="M4 7.6a6.3 6.3 0 0 1 9 0l-1.4 1.3a4.3 4.3 0 0 0-6.2 0L4 7.6z"/>
+      <path d="M1.1 4.5a10.4 10.4 0 0 1 14.8 0l-1.4 1.3a8.4 8.4 0 0 0-12 0L1.1 4.5z"/>
+    </svg>
+    <svg class="icon icon-battery" viewBox="0 0 27 12" fill="none" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="23" height="11" rx="3" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+      <rect x="2" y="2" width="18" height="8" rx="1.6" fill="currentColor"/>
+      <rect x="24.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" opacity="0.45"/>
+    </svg>
   `;
   statusBar.appendChild(statusTime);
   statusBar.appendChild(statusRight);
@@ -450,14 +535,31 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   const urlPill = document.createElement('div');
   urlPill.className = 'pill';
   urlPill.innerHTML = `
-    <svg class="lock" viewBox="0 0 12 12" fill="currentColor"><path d="M3 5V4a3 3 0 0 1 6 0v1h1v6H2V5h1zm1 0h4V4a2 2 0 0 0-4 0v1z"/></svg>
-    <span class="url-text"></span>
+    <button class="aa-btn" tabindex="-1" aria-hidden="true"><span class="aa-small">A</span><span class="aa-big">A</span></button>
+    <div class="url-content">
+      <svg class="lock" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M3 5V4a3 3 0 0 1 6 0v1h1v6H2V5h1zm1 0h4V4a2 2 0 0 0-4 0v1z"/></svg>
+      <span class="url-text"></span>
+    </div>
+    <button class="reload-btn" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><polyline points="13.5 2 13.5 5 10.5 5"/></svg>
+    </button>
   `;
   const urlText = urlPill.querySelector('.url-text') as HTMLSpanElement;
   urlBar.appendChild(urlPill);
   const loadingBar = document.createElement('div');
   loadingBar.className = 'loading-bar';
   urlBar.appendChild(loadingBar);
+
+  // iOS bottom action toolbar (back / forward / share / bookmarks / tabs)
+  const iosToolbar = document.createElement('div');
+  iosToolbar.className = 'ios-toolbar';
+  iosToolbar.innerHTML = `
+    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></span>
+    <span class="tool disabled" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+    <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
+    <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg></span>
+    <span class="tool" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="13" height="13" rx="2"/><rect x="7" y="4" width="13" height="13" rx="2"/></svg></span>
+  `;
 
   // Iframe
   const iframe = document.createElement('iframe');
@@ -481,6 +583,7 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
   screen.appendChild(statusBar);
   screen.appendChild(urlBar);
   screen.appendChild(iframe);
+  screen.appendChild(iosToolbar);
   screen.appendChild(homeIndicator);
   screen.appendChild(notchEl);
 
@@ -568,6 +671,7 @@ function buildOverlay(initialDeviceId: string, initialOrientation: Orientation):
     urlBar,
     urlText,
     loadingBar,
+    iosToolbar,
     homeIndicator,
     topLabel,
     topDims,
@@ -758,20 +862,24 @@ function applyState(handle: OverlayHandle): void {
   // Re-arrange children:
   //  - Android (top URL): status -> urlBar -> iframe -> homeIndicator
   //  - iOS classic (bottom URL): status -> iframe -> urlBar
-  //  - iOS notched (floating URL + home): status -> iframe; urlBar/home overlay
+  //  - iOS notched (floating URL + toolbar + home): status -> iframe; rest overlay
   const s = handle.screen;
   s.appendChild(handle.statusBar);
   if (chrome.urlBarPosition === 'top') {
     s.appendChild(handle.urlBar);
     s.appendChild(handle.iframe);
     s.appendChild(handle.homeIndicator);
+    handle.iosToolbar.classList.remove('visible');
   } else if (floatingUrl) {
     s.appendChild(handle.iframe);
     s.appendChild(handle.urlBar);
+    s.appendChild(handle.iosToolbar);
     s.appendChild(handle.homeIndicator);
+    handle.iosToolbar.classList.add('visible');
   } else {
     s.appendChild(handle.iframe);
     s.appendChild(handle.urlBar);
+    handle.iosToolbar.classList.remove('visible');
   }
   s.appendChild(handle.notchEl);
 
